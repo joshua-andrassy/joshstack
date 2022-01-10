@@ -1,11 +1,31 @@
 version: "3.9"
 services:
-  postgres:
-    image: postgres:13.3
-    environment: 
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_USER: ${POSTGRES_USER}
-    ports:
-        - 5432:5432
-    volumes:
-        - ./volumes/postgres:/var/lib/postgresql/data:delegated
+    postgres:
+        image: postgres:${POSTGRES_VERSION}
+        environment: 
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_USER: ${POSTGRES_USER}
+        ports:
+            - ${POSTGRES_PORT}:5432
+        volumes:
+            - ${VOLUMES_ROOT}/postgres:/var/lib/postgresql/data:delegated
+    
+    prometheus:
+        image: prom/prometheus:${PROMETHEUS_VERSION}
+        ports:
+            - ${PROMETHEUS_PORT}:9090
+        volumes:
+            - ${PROMETHEUS_CONFIG}:/etc/prometheus/prometheus.yml
+            - ${VOLUMES_ROOT}/prometheus:/prometheus:delegated
+    
+    rabbitmq:
+        image: rabbitmq:${RABBITMQ_VERSION}
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+        ports:
+            - ${RABBITMQ_MGMT_PORT}:15672
+            - ${RABBITMQ_PORT}:5672
+        volumes:
+            - ${VOLUMES_ROOT}/rabbitmq:/var/lib/rabbitmq
+
